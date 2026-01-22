@@ -41,14 +41,14 @@ router.post('/send', apiAuth, async (req, res) => {
 
 
 
-router.get('/getallreceipients', apiAuth, async (req, res) => {
+router.get('/recipients', apiAuth, async (req, res) => {
     try {
         const recipients = await Sms.findAll({
+            where: { userId: req.user.id },
             attributes: ['to'],
             group: 'to',
             raw: true
         });
-        console.log(recipients);
 
         res.json(recipients);
     } catch (error) {
@@ -62,6 +62,20 @@ router.get('/status/:id', apiAuth, async (req, res) => {
     if (!sms) return res.status(404).json({ error: 'Not found' });
 
     res.json({ status: sms.status });
+});
+
+router.get('/history', apiAuth, async (req, res) => {
+    try {
+        const sms = await Sms.findAll({
+            where: { userId: req.user.id },
+            order: [['createdAt', 'DESC']],
+            limit: 50
+        });
+        res.json(sms);
+    } catch (error) {
+        console.error("Error fetching history:", error);
+        res.status(500).json({ error: 'Failed to fetch history' });
+    }
 });
 
 module.exports = router;

@@ -57,4 +57,18 @@ router.delete('/devices/:id', auth, async (req, res) => {
     }
 });
 
+router.get('/recipients', auth, async (req, res) => {
+    try {
+        const recipients = await Sms.findAll({
+            where: { userId: req.user.id },
+            attributes: ['to'],
+            group: 'to',
+            raw: true
+        });
+        res.json(recipients);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;
