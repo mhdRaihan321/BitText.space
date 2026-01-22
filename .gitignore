@@ -1,0 +1,8 @@
+# Create the .gitignore file
+cat <<EOF > .gitignore
+.env
+clientSecret.json
+node_modules/
+BackEnd.zip
+*.log
+EOF
