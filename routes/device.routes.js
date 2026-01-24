@@ -1,8 +1,18 @@
 const router = require('express').Router();
 const { Sms, Device, User } = require('../models');
-const { deviceAuth } = require('../middleware/auth');
+const { deviceAuth, apiAuth } = require('../middleware/auth');
 const { generateDeviceSecret } = require('../utils/keygen');
 const { Op } = require('sequelize');
+
+// List devices (API Key Auth)
+router.get('/list', apiAuth, async (req, res) => {
+    try {
+        const devices = await Device.findAll({ where: { userId: req.user.id } });
+        res.json(devices);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // Register a new device
 router.post('/register', async (req, res) => {

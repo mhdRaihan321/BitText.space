@@ -56,7 +56,6 @@ app.get('/', async (req, res) => {
     });
 });
 
-
 sequelize.sync({}).then(() => {
     app.listen(process.env.PORT, () =>
         console.log(`SMS Gateway running on ${process.env.PORT}`)
