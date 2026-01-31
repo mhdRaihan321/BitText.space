@@ -15,7 +15,7 @@ try {
 } catch (error) {
     console.warn("Firebase Admin Initialization Failed (Missing serviceAccountKey.json?)", error.message);
 }
-
+// FCM 
 const sendWakeUpPush = async (fcmToken) => {
     if (!isInitialized || !fcmToken) return;
 
