@@ -42,15 +42,32 @@ router.delete('/devices/:id', auth, async (req, res) => {
     console.log("ID: ", req.params.id);
 
     try {
-        const result = await Device.destroy({
+        const device = await Device.findOne({
             where: {
                 id: req.params.id,
                 userId: req.user.id
             }
         });
-        if (result === 0) {
+
+        if (!device) {
             return res.status(404).json({ error: 'Device not found or not authorized' });
         }
+
+        // Trigger Logout Push before deletion
+        if (device.fcmToken) {
+            const admin = require('firebase-admin');
+            try {
+                await admin.messaging().send({
+                    data: { type: "LOGOUT" },
+                    token: device.fcmToken
+                });
+                console.log("Sent LOGOUT push to " + device.id);
+            } catch (e) {
+                console.error("Failed to send logout push", e);
+            }
+        }
+
+        await device.destroy();
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -101,7 +101,7 @@ router.get('/jobs', deviceAuth, async (req, res) => {
 
 router.post('/update', deviceAuth, async (req, res) => {
     try {
-        const { active } = req.body;
+        const { active, status } = req.body;
 
         const device = await Device.findByPk(req.device.id);
         if (!device) return res.status(404).json({ error: 'Device not found' });
@@ -111,6 +111,14 @@ router.post('/update', deviceAuth, async (req, res) => {
 
         if (active !== undefined) {
             device.active = active;
+        }
+
+        // Update status if provided (SLEEPING/ACTIVE)
+        if (status) {
+            device.status = status;
+        } else {
+            // If manual active update, assume ACTIVE
+            if (active === true) device.status = 'ACTIVE';
         }
 
         await device.save();
@@ -123,11 +131,12 @@ router.post('/update', deviceAuth, async (req, res) => {
             hour12: true
         });
 
-        console.log(`Device ${device.id} status updated. Active: ${device.active}, Last Seen: ${formattedDateTime}`);
+        console.log(`Device ${device.id} status updated. Active: ${device.active}, Status: ${device.status}, Last Seen: ${formattedDateTime}`);
 
         res.json({
             success: true,
             active: device.active,
+            status: device.status,
             last_seen_ist: formattedDateTime
         });
     } catch (error) {
@@ -174,6 +183,41 @@ router.post('/report', deviceAuth, async (req, res) => {
     } catch (error) {
         console.error("Error reporting SMS status:", error);
         res.status(500).json({ error: 'Failed to report status' });
+    }
+});
+
+});
+
+// Delete Device (Auth via Secret)
+router.delete('/delete', deviceAuth, async (req, res) => {
+    try {
+        const device = await Device.findByPk(req.device.id);
+        if (!device) return res.status(404).json({ error: 'Device not found' });
+
+        // Trigger Logout Push before deletion
+        if (device.fcmToken) {
+            const { sendWakeUpPush } = require('../utils/fcm');
+            // Assuming we modify sendWakeUpPush or use a raw admin send here
+            // But sendWakeUpPush basically sends "type: WAKE_UP". 
+            // We need a specific LOGOUT type.
+            // Let's assume we update sendWakeUpPush OR just do it manually here for now to be safe/fast.
+            const admin = require('firebase-admin');
+            try {
+                await admin.messaging().send({
+                    data: { type: "LOGOUT" },
+                    token: device.fcmToken
+                });
+                console.log("Sent LOGOUT push to " + device.id);
+            } catch (e) {
+                console.error("Failed to send logout push", e);
+            }
+        }
+
+        await device.destroy();
+        res.json({ success: true, message: 'Device deleted' });
+    } catch (err) {
+        console.error("Device Deletion Error:", err);
+        res.status(500).json({ error: 'Failed to delete device' });
     }
 });
 
