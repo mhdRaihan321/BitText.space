@@ -19,13 +19,18 @@ router.post('/send', apiAuth, async (req, res) => {
         finalMessage = `<#> Your OTP is ${otp}`;
     }
 
+    // Sanitize deviceId
+    const targetDeviceId = (deviceId && deviceId !== "null" && deviceId !== "") ? deviceId : null;
+
     try {
         const sms = await Sms.create({
             to,
             message: finalMessage,
             userId: req.user.id,
-            deviceId: deviceId || null
+            deviceId: targetDeviceId
         });
+
+        logger.info(`SMS Queued: ID ${sms.id} to ${to} (Device: ${targetDeviceId || 'Any'})`);
 
         // Auto Wake-Up-On-MSG Added
 
