@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const path = require('path');
+const logger = require('./logger');
 
 let isInitialized = false;
 
@@ -33,9 +34,9 @@ const sendWakeUpPush = async (fcmToken) => {
 
     try {
         const response = await admin.messaging().send(message);
-        console.log('Successfully sent wake-up message:', response);
+        logger.info(`Successfully sent wake-up message to token: ${fcmToken.substring(0, 10)}...`);
     } catch (error) {
-        console.error('Error sending wake-up message:', error);
+        logger.error('Error sending wake-up message:', error);
     }
 };
 

@@ -37,8 +37,8 @@ router.post('/send', apiAuth, async (req, res) => {
 
         // Smart Wake-up Trigger
         // We find the device (if assigned) and send a push.
-        if (deviceId) {
-            const device = await Device.findByPk(deviceId);
+        if (targetDeviceId) {
+            const device = await Device.findByPk(targetDeviceId);
             if (device && device.fcmToken) {
                 const { sendWakeUpPush } = require('../utils/fcm');
                 sendWakeUpPush(device.fcmToken);
