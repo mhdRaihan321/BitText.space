@@ -5,6 +5,7 @@ const { sequelize } = require('./models');
 const cors = require('cors');
 
 const app = express();
+const logger = require('./utils/logger'); // Custom Logger
 
 // 2. Configure CORS
 app.use(cors({
@@ -12,6 +13,7 @@ app.use(cors({
     credentials: true                // Required if using sessions/cookies/passport
 }));
 app.use(bodyParser.json());
+app.use(logger.requestLogger); // Log requests to file
 app.use(express.static('web'));
 
 app.use('/api/sms', require('./routes/sms.routes'));

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { Sms, Device, User } = require('../models');
 const { deviceAuth, apiAuth } = require('../middleware/auth');
 const { generateDeviceSecret } = require('../utils/keygen');
+const logger = require('../utils/logger');
 const { Op } = require('sequelize');
 
 // List devices (API Key Auth)
@@ -123,6 +124,8 @@ router.post('/update', deviceAuth, async (req, res) => {
 
         await device.save();
 
+        await device.save();
+
         // Format for response if needed
         const formattedDateTime = now.toLocaleString("en-IN", {
             timeZone: "Asia/Kolkata",
@@ -131,7 +134,7 @@ router.post('/update', deviceAuth, async (req, res) => {
             hour12: true
         });
 
-        console.log(`Device ${device.id} status updated. Active: ${device.active}, Status: ${device.status}, Last Seen: ${formattedDateTime}`);
+        logger.info(`Device ${device.id} status updated. Active: ${device.active}, Status: ${device.status}, Last Seen: ${formattedDateTime}`);
 
         res.json({
             success: true,
@@ -140,7 +143,7 @@ router.post('/update', deviceAuth, async (req, res) => {
             last_seen_ist: formattedDateTime
         });
     } catch (error) {
-        console.error("Error updating device:", error);
+        logger.error("Error updating device:", error);
         res.status(500).json({ error: 'Failed to update device' });
     }
 });
