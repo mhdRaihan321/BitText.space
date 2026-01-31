@@ -9,3 +9,8 @@ module.exports = sequelize.define('sms', {
         defaultValue: 'QUEUED'
     }
 });
+
+
+
+
+
