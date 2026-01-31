@@ -186,7 +186,7 @@ router.post('/report', deviceAuth, async (req, res) => {
     }
 });
 
-});
+
 
 // Delete Device (Auth via Secret)
 router.delete('/delete', deviceAuth, async (req, res) => {
