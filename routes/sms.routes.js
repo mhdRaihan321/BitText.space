@@ -27,15 +27,6 @@ router.post('/send', apiAuth, async (req, res) => {
             deviceId: deviceId || null
         });
 
-
-
-
-
-
-
-
-
-
         // Auto Wake-Up-On-MSG Added
 
         // Smart Wake-up Trigger
