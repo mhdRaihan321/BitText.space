@@ -11,3 +11,12 @@ module.exports = sequelize.define('refreshToken', {
         allowNull: false
     }
 });
+
+
+
+
+
+
+
+
+
