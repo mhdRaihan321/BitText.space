@@ -72,9 +72,14 @@ router.post('/register', async (req, res) => {
 // Device polls for jobs
 router.get('/jobs', deviceAuth, async (req, res) => {
     try {
+        // Auto-activate device on poll
+        const now = new Date();
+        req.device.last_seen = now;
         if (!req.device.active) {
-            return res.status(403).json({ error: 'Device is inactive' });
+            req.device.active = true;
+            req.device.status = 'ACTIVE';
         }
+        await req.device.save();
 
         const jobs = await Sms.findAll({
             where: {
@@ -199,11 +204,6 @@ router.delete('/delete', deviceAuth, async (req, res) => {
 
         // Trigger Logout Push before deletion
         if (device.fcmToken) {
-            const { sendWakeUpPush } = require('../utils/fcm');
-            // Assuming we modify sendWakeUpPush or use a raw admin send here
-            // But sendWakeUpPush basically sends "type: WAKE_UP". 
-            // We need a specific LOGOUT type.
-            // Let's assume we update sendWakeUpPush OR just do it manually here for now to be safe/fast.
             const admin = require('firebase-admin');
             try {
                 await admin.messaging().send({
