@@ -137,6 +137,22 @@ router.post('/update', deviceAuth, async (req, res) => {
 });
 
 
+// Update FCM Token
+router.post('/fcm-token', deviceAuth, async (req, res) => {
+    try {
+        const { fcm_token } = req.body;
+        if (!fcm_token) return res.status(400).json({ error: 'Token required' });
+
+        const device = await Device.findByPk(req.device.id);
+        device.fcmToken = fcm_token;
+        await device.save();
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("FCM Token Update Error:", err);
+        res.status(500).json({ error: 'Failed' });
+    }
+});
 
 
 // Device reports result

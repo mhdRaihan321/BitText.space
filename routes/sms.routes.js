@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Sms } = require('../models');
+const { Sms, Device } = require('../models');
 const { apiAuth } = require('../middleware/auth');
 
 router.post('/send', apiAuth, async (req, res) => {
@@ -26,6 +26,17 @@ router.post('/send', apiAuth, async (req, res) => {
             userId: req.user.id,
             deviceId: deviceId || null
         });
+
+
+        // Smart Wake-up Trigger
+        // We find the device (if assigned) and send a push.
+        if (deviceId) {
+            const device = await Device.findByPk(deviceId);
+            if (device && device.fcmToken) {
+                const { sendWakeUpPush } = require('../utils/fcm');
+                sendWakeUpPush(device.fcmToken);
+            }
+        }
 
         res.json({
             success: true,

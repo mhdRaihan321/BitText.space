@@ -12,5 +12,9 @@ module.exports = sequelize.define('device', {
     userId: {
         type: DataTypes.INTEGER,
         allowNull: true
+    },
+    fcmToken: {
+        type: DataTypes.TEXT, // Token can be long
+        allowNull: true
     }
 });
