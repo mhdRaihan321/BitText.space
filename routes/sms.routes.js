@@ -28,6 +28,16 @@ router.post('/send', apiAuth, async (req, res) => {
         });
 
 
+
+
+
+
+
+
+
+
+        // Auto Wake-Up-On-MSG Added
+
         // Smart Wake-up Trigger
         // We find the device (if assigned) and send a push.
         if (deviceId) {
