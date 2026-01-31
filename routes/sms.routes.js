@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Sms, Device } = require('../models');
 const { apiAuth } = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 router.post('/send', apiAuth, async (req, res) => {
     const { to, messagetype, message, deviceId } = req.body;
