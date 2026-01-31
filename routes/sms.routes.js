@@ -36,12 +36,21 @@ router.post('/send', apiAuth, async (req, res) => {
         // Auto Wake-Up-On-MSG Added
 
         // Smart Wake-up Trigger
-        // We find the device (if assigned) and send a push.
+        const { sendWakeUpPush } = require('../utils/fcm');
         if (targetDeviceId) {
             const device = await Device.findByPk(targetDeviceId);
             if (device && device.fcmToken) {
-                const { sendWakeUpPush } = require('../utils/fcm');
+                logger.info(`Sending targeted wake-up push to device: ${targetDeviceId}`);
                 sendWakeUpPush(device.fcmToken);
+            } else {
+                logger.info(`No FCM token found for target device: ${targetDeviceId}`);
+            }
+        } else {
+            // Wake up ALL devices for this user if no specific device targeted
+            const devices = await Device.findAll({ where: { userId: req.user.id, active: true } });
+            logger.info(`Sending broadcast wake-up push to ${devices.length} devices for user ${req.user.id}`);
+            for (const d of devices) {
+                if (d.fcmToken) sendWakeUpPush(d.fcmToken);
             }
         }
 
