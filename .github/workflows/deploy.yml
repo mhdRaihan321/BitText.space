@@ -23,4 +23,4 @@ jobs:
         run: |
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no"
           git remote add cpanel ssh://iamraih1@iamraihan.site/home/iamraih1/raihan-ci-cd
-          git push cpanel main
+          git push cpanel main --force
